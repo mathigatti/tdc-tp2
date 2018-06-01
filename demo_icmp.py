@@ -17,12 +17,33 @@ parser.add_argument('--timeout', '-o', dest='timeout', default=1, help='timeout 
 parser.add_argument('--verbose', '-v', action='store_true', help='agregar si se desea verbosidad de la herramienta (default: no)')
 args = parser.parse_args()
 
+tau_by_n = {
+    3: 1.1511,
+    4: 1.4250,
+    5: 1.5712,
+    6: 1.6563,
+    7: 1.7110,
+    8: 1.7491,
+    9: 1.7770,
+    10: 1.7984,
+    11: 1.8153,
+    12: 1.8290,
+    13: 1.8403,
+    14: 1.8498,
+    15: 1.8579,
+    16: 1.8649,
+    17: 1.8710,
+    18: 1.8764,
+    19: 1.8811,
+    20: 1.8853
+}
+
 # Diccionario que para cada ttl, guarda una lista con tuplas (host, rtt)
 responses = {}
 
 ttl_range = range(1, args.ttl+1)
 
-def print_route(rs):
+def get_route_stats(rs):
     table = {}
     last_rtt = 0
     for ttl in ttl_range:
@@ -38,24 +59,35 @@ def print_route(rs):
         else:
             table[ttl] = (avg_rtt, std_rtt, avg_rtt-last_rtt, ips)
             last_rtt = avg_rtt
-    
+
+    delta_rtts = [(ttl,table[ttl][2]) for ttl in table]
+    avg_delta = average([delta for (_, delta) in delta_rtts])
+    std_delta = std([delta for (_, delta) in delta_rtts], ddof=1)
+
+    standardized_delta_rtts = map((lambda (ttl, delta): (ttl, (delta - avg_delta)/std_delta)), delta_rtts)
+
+    return table, list(standardized_delta_rtts)
+
+def print_route(rs):
+    table, _ = get_route_stats(rs)    
     print("ttl\tavg_rtt\tstd_rtt\td_rtt\tips")
     for ttl in ttl_range:
         if ttl not in table:
-            print(ttl, "\t*\t*\t*\t*")
+            print str(ttl) + '\t*\t*\t*\t*'
         else:
             # table[ttl] = (avg_rtt, std_rtt, delta_rtt, ips)
-            print("%d\t" % (ttl) + "%.2f\t%.2f\t%.2f\t%s" % table[ttl])
+            print "%d\t" % (ttl) + "%.2f\t%.2f\t%.2f\t%s" % table[ttl]
 
 
 # Recordar que se pueden invertir los siguientes ciclos.
-for i in range(args.queries):
-    for ttl in ttl_range:
+dest_reached = False
+for ttl in ttl_range:
+    for i in range(args.queries):
         probe = IP(dst=args.host, ttl=ttl) / ICMP()
 
         t_i = time()
         # Envia un paquete, y devuelve la respuesta (si la hubo)
-        ans = sr1(probe, verbose=False, timeout=args.timeout)
+        ans = sr1(probe, verbose=False, timeout=float(args.timeout))
         t_f = time()
 
         if ans is not None:
@@ -67,11 +99,28 @@ for i in range(args.queries):
             responses[ttl].append((ans.src, rtt))
 
         os.system('clear')
-        print("%s, iteracion %d" %(args.host, i+1))
+        print "{host}, ttl={ttl}, iteracion {it}".format(host=args.host, ttl=ttl, it=i+1) 
         print_route( responses )
 
         # Tipo 0: echo-reply
-        if ans is not None and ans.type==0: break
+        dest_reached = dest_reached or (ans is not None and ans.type==0)
+    if dest_reached: break
+
+_, z_scores = get_route_stats(responses)
+print "z-scores:", z_scores
+sample_size = len(z_scores)
+print "tau:", tau_by_n[sample_size]
+
+mask = list(map((lambda (ttl, z_score): z_score > tau_by_n[sample_size]), z_scores))
+
+if not any(mask):
+    print "No se detectaron enlaces intercontinentales"
+else:
+    for i in xrange(len(mask)):
+        if mask[i]:
+            print "Hay un enlace continental en el salto", z_scores[i][0], "con z-score", z_scores[i][1]
+
+
             
 
 
