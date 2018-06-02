@@ -111,14 +111,14 @@ print "z-scores:", z_scores
 sample_size = len(z_scores)
 print "tau:", tau_by_n[sample_size]
 
-mask = list(map((lambda (ttl, z_score): z_score > tau_by_n[sample_size]), z_scores))
+outliers_mask = list(map((lambda (ttl, z_score): z_score > tau_by_n[sample_size]), z_scores))
 
-if not any(mask):
+if not any(outliers_mask):
     print "No se detectaron enlaces intercontinentales"
 else:
-    for i in xrange(len(mask)):
-        if mask[i]:
-            print "Hay un enlace continental en el salto", z_scores[i][0], "con z-score", z_scores[i][1]
+    for i in xrange(len(outliers_mask)):
+        if outliers_mask[i]:
+            print "Hay un enlace intercontinental en el salto", z_scores[i][0], "con z-score", z_scores[i][1]
 
 
             
