@@ -1,0 +1,26 @@
+\section{Métodos}
+\subsection*{Herramientas}
+Para la captura de tráfico se utilizó el módulo de manipulación de paquetes \emph{Scapy} para python, el cual provee una interfaz sencilla para nuestros requerimientos puntuales. \emph{Scapy} permite la captura y posterior guardado de paquetes en una red, para luego ser filtrados, inspeccionados o manipulados con facilidad. Además, para incrementar la cantidad de paquetes vistos por un host, se activó el modo promiscuo o modo monitor en sus respectivas interfaces de red.
+
+\subsection*{Modelo de las fuentes}
+
+\subsubsection*{Fuente S1}
+Dado el tráfico de capa 2 obtenido en cada captura, se modeló una fuente de memoria nula S1 = $ \{ s_{1}, s_{2}, s_{3},...,s_{n} \}$ donde cada $ s_{i} $ está formado por una tupla <broadcast|unicast, protocolo capa 3>.
+
+\subsubsection*{Fuente S2}
+Igualmente que S1, se modeló la fuente de memoria nula S2 con el objetivo utilizando sólo las direcciones IP dentro de paquetes de protocolo ARP con el objetivo de poder distinguir los hosts de cada red. En este caso se consideraron diversas opciones para el modelado de la fuente, donde cada $ s_{i} $ representaba las direcciones IP de los hosts, aunque su contabilización se regía por si la dirección aparecía en los campos:
+\begin{itemize}
+	\item Fuente o Destino
+	\item who-has Fuente
+	\item who-has Destino
+	\item is-at Fuente
+	\item is-at Destino
+\end{itemize}
+
+\subsubsection*{Capturas}
+Se hicieron 3 capturas en redes diferentes de 10000 paquetes cada una:
+\begin{itemize}
+	\item Red hogareña mediana, con aproximadamente 10 usuarios, se utilizó una interfaz ethernet.
+	\item Red pública grande, en este caso se capturó mediante una interfaz wifi el tráfico del laboratorio de informática de la universidad.
+	\item Red pública grande, también mediante la interfaz wifi, se capturó el tráfico en un Starbucks.
+\end{itemize}
