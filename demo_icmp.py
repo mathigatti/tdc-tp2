@@ -35,7 +35,19 @@ tau_by_n = {
     17: 1.8710,
     18: 1.8764,
     19: 1.8811,
-    20: 1.8853
+    20: 1.8853,
+    21: 1.8891,
+    22: 1.8926,
+    23: 1.8957,
+    24: 1.8985,
+    25: 1.9011,
+    26: 1.9035,
+    27: 1.9057,
+    28: 1.9078,
+    29: 1.9096,
+    30: 1.9114,
+    31: 1.9130,
+    float('inf'): 1.9600
 }
 
 # Diccionario que para cada ttl, guarda una lista con tuplas (host, rtt)
@@ -111,7 +123,14 @@ print "z-scores:", z_scores
 sample_size = len(z_scores)
 print "tau:", tau_by_n[sample_size]
 
-outliers_mask = list(map((lambda (ttl, z_score): z_score > tau_by_n[sample_size]), z_scores))
+def outlier(z_score, sample_size):
+    if sample_size in tau_by_n:
+        return z_score > tau_by_n[sample_size]
+    else:
+        print "ATENCION: Muestra muy grande, utilizando maximo tau"
+        return z_score > tau_by_n[float('inf')]
+
+outliers_mask = list(map((lambda (ttl, z_score): outlier(z_score, sample_size)), z_scores))
 
 if not any(outliers_mask):
     print "No se detectaron enlaces intercontinentales"
