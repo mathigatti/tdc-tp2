@@ -57,7 +57,11 @@ Para este caso, podemos observar en la figura \ref{plot-moscow}, que se detectan
 
 El primer pico, que se da en el salto 11, coincide con un salto a un router de Roma, Italia (\texttt{89.221.41.171}). La cuestión es que el nodo desde el cual se realiza el hop también está ubicado en Italia (\texttt{185.70.203.32}), y dicho salto no fue detectado como outlier, pues en efecto tiene un RTT mucho más bajo. Una posible hipótesis que manejamos al respecto de porque ocurrió esto (que no se detecte el salto continental, pero sí el siguiente hop) es que el primer router al que se llega sea uno de los principales gateways de Italia, lo que provoque que se encuentre congestionado y el paquete que se manda quede encolado un largo tiempo antes de forwardearse al siguiente hop. 
 
-El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de "camino asimétrico" (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio de estado de la red: por alguna razón el camino "óptimo" desde Italia a Rusia dejo de estar habilitado.
+El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de "camino asimétrico" (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio del estado de la red: por alguna razón el camino "óptimo" desde Italia a Rusia dejo de estar habilitado.
+
+En definitiva, hay que decir que en este caso tuvimos dos falsos positivos y tres falsos negativos (Argentina-Italia, Italia-USA, USA-Rusia). 
+
+Algo para señanalar, es que este caso se corrió desde la misma LAN que la ruta anterior, y puede verse en los gráficos que efectivamente el RTT del primer salto fue igual, pero en este caso, a diferencia del anterior, no se consideró un \emph{outlier}, pues había saltos mucho más costosos.
 
 \subsection*{Universidad de Sidney}
 
@@ -73,14 +77,14 @@ A continuación se puede ver de forma bastante clara como el paquete tuvo que pa
 
 \subsubsection*{RTT entre saltos}
 
-A continuación intentamos ver los timepos entre saltos. Para esto calculamos la media de cada de los RTTs obtenidos de cada TTL para reducir a solo un valor las mediciones obtenidas por cada TTL. 
-
-Seguido de esto realizamos dos experimentos. Primero simplemente restamos los RTTs medios entre si como se puede ver en el primer gráfico, luego llevamos el experimento un paso mas allá normalizando con z-score los RTTs para eliminar cualquier tipo de deformación en las dimensiones del gráfico.
-
 \begin{figure}[H]
   \centering
   \includegraphics[width=8.5cm]{figs/traceroute-sidney.pdf}
   \caption{\footnotesize RTT entre saltos (antes y después de normalizar respectivamente) para el sitio \texttt{sydney.edu.au}. $n$ es la cantidad de TTLs para los que se obtuvo un \emph{time exceed} (que son los puntos que se grafican).}
 \end{figure}
 
-Como se puede observar ... COMPLETAR.
+Finalmente, para esta ruta vemos que se detectó un salto intercontinental en el octavo hop. Este efectivamente fue un salto de Argentina a Estados Unidos (que como mencionamos en la sección anterior, vamos a considerar un salto continental). Por otro lado, no se detectó el salto de Estados Unidos a Australia en el salto 19, aunque puede verse en el gráfico que estuvo bastante cerca de alcanzar el threshold.
+
+Para esta ruta tuvimos entonces un falso negativo, y un verdadero positivo.
+
+Algo que puede valer la pena mencionar de este caso es que la mayoría de los valles donde el delta RTT da 0ms son saltos donde la diferencia de tiempo es menor que la varianza, lo cual es razonable ya que se mueven entre nodos que están cercanos entre si.

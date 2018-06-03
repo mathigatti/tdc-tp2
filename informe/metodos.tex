@@ -3,13 +3,19 @@
 \subsection*{Herramientas}
 Para la implementación de traceroute utilizamos el código provisto por la catedra al cual le realizamos ciertas modificaciones para poder detectar anomalías y guardar los datos obtenidos de forma más cómoda.
 
-\subsection*{Detección de Anomalías}
+\subsection*{Detección de saltos intercontinentales}
 
-Como se describe en Cimbala\footnote{http://www.net.in.tum.de/fileadmin/TUM/NET/NET-2012-08-1/
-NET-2012-08-1\_02.pdf} aplicamos un cálculo el cual compara los datos normalizados con z-score con una valor $\tau$ derivado del t-student con un $\alpha$ de 0.05 lo cual modela un intervalo de confianza el cual descarta los 0.025 percentiles.
+Para la detección automática de saltos intercontinentales aplicamos una técnica basada en el Modified Thompson Tau Test para detección de outliers, como se explica en Cimbala\footnote{http://www.net.in.tum.de/fileadmin/TUM/NET/NET-2012-08-1/
+NET-2012-08-1\_02.pdf}. Dicho test consiste en comparar el valor absoluto de las muestras estandarizadas (mediante z-score) contra un estadístico, $\tau$, que depende del tamaño de la muestra. En particular, nuestra versión difiere con la presentada con la de Cimbala en que no tomamos el valor absoluto del z-score, dado que no estamos interesados en detectar los casos atípicamente pequeños. 
+
+\subsection*{Asunciones realizadas}
+\begin{itemize}
+	\item A los fines prácticos, vamos a considerar que un salto de América del Sur a América del Norte se considera un salto intercontinental, por la extensión del mismo.
+	\item A veces se da el caso en que el RTT promedio para un cierto TTL puede ser menor que el RTT del TTL anterior. Ante esta situación seteamos el RTT diferencial (delta) en 0. Razones por las que puede suceder esto son el problema de los \emph{caminos asimétricos}, o bien que haya un desvío estándar elevado y el hop realizado sea corto. Se nos presento entonces la duda de si considerar estos valores o no a la hora de hacer el cálculo de los \emph{outliers}. Decidimos que tanto un problema como el otro pueden estar afectando a otros hops que sin embargo no llegaron a dar 0, pero dieron un valor menor al que deberían. Por lo tanto, sería injusto (y posiblemente un error metodológico) solo omitir a los valores nulos.
+\end{itemize}
 
 
-\subsubsection*{Capturas}
+\subsubsection*{Rutas}
 Se corrió traceroute sobre 3 universidades distintas con un ttl de 30 y 40 queries. Con el objetivo de lograr contrastar elegimos universidades muy lejanas y muy cercanas. A continuación describimos brevemente a cada una.
 
 \begin{itemize}
