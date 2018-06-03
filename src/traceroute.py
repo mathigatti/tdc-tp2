@@ -60,6 +60,7 @@ ttl_range = range(1, args.ttl+1)
 def get_route_stats(rs):
     table = {}
     last_rtt = 0
+    extradata_list = []
     for ttl in ttl_range:
         if ttl not in rs: continue
 
@@ -67,6 +68,8 @@ def get_route_stats(rs):
         ips = ",".join(list(set([ r[0] for r in rs[ttl] ])))
         avg_rtt = average( [ r[1] for r in rs[ttl] ] )
         std_rtt = std( [ r[1] for r in rs[ttl] ] )
+
+        extradata_list.append((avg_rtt, std_rtt, ips))
 
         if avg_rtt-last_rtt<0.0:
             table[ttl] = (avg_rtt, std_rtt, 0, ips)
@@ -78,9 +81,11 @@ def get_route_stats(rs):
     avg_delta = average([delta for (_, delta) in delta_rtts])
     std_delta = std([delta for (_, delta) in delta_rtts], ddof=1)
 
-    standardized_delta_rtts = map((lambda (ttl, delta): (ttl, (delta - avg_delta)/std_delta, delta)), delta_rtts)
+    stats = map((lambda (ttl, delta): (ttl, (delta - avg_delta)/std_delta, delta)), delta_rtts)
+    stats = [(ttl, delta_norm, delta, avg_rtt, std_rtt, ips) 
+            for ((ttl, delta_norm, delta), (avg_rtt, std_rtt, ips)) in zip(stats, extradata_list)]
 
-    return table, list(standardized_delta_rtts)
+    return table, list(stats)
 
 def print_route(rs):
     table, _ = get_route_stats(rs)    
@@ -120,16 +125,17 @@ for ttl in ttl_range:
         dest_reached = dest_reached or (ans is not None and ans.type==0)
     if dest_reached: break
 
-_, z_scores = get_route_stats(responses)
+_, stats = get_route_stats(responses)
 
 if args.csv_file:
     with open(args.csv_file, 'w') as out_f:
-        writer = csv.writer(out_f)
-        for row in z_scores:
+        writer = csv.writer(out_f, delimiter='\t')
+        writer.writerow(('ttl', 'z-score', 'delta', 'avg_rtt', 'std_rtt','ips'))
+        for row in stats:
             writer.writerow(row)
 
-print "z-scores:", z_scores
-sample_size = len(z_scores)
+print "z-scores:", stats
+sample_size = len(stats)
 print "tau:", tau_by_n[sample_size]
 
 def outlier(z_score, sample_size):
@@ -139,14 +145,14 @@ def outlier(z_score, sample_size):
         print "ATENCION: Muestra muy grande, utilizando maximo tau"
         return z_score > tau_by_n[float('inf')]
 
-outliers_mask = list(map((lambda (ttl, z_score, delta): outlier(z_score, sample_size)), z_scores))
+outliers_mask = list(map((lambda (ttl, z_score, delta, avg_rtt, std_rtt, ips): outlier(z_score, sample_size)), stats))
 
 if not any(outliers_mask):
     print "No se detectaron enlaces intercontinentales"
 else:
     for i in xrange(len(outliers_mask)):
         if outliers_mask[i]:
-            print "Hay un enlace intercontinental en el salto", z_scores[i][0], "con z-score", z_scores[i][1]
+            print "Hay un enlace intercontinental en el salto", stats[i][0], "con z-score", stats[i][1]
 
 
             
