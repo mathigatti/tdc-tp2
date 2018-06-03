@@ -3,6 +3,7 @@
 # requerimientos: python3, scapy, numpy
 import sys, os, argparse
 from numpy import average,std
+import csv
 
 # from math import log as LOG
 from scapy.all import *
@@ -15,6 +16,7 @@ parser.add_argument('--ttl', '-t', dest='ttl',  type=int, default=30, help='ttl 
 parser.add_argument('--queries', '-q', dest='queries',  type=int, default=1, help='numero de paquetes que se le envia a cada hop (default: 1)')
 parser.add_argument('--timeout', '-o', dest='timeout', default=1, help='timeout del envio de cada paquete (default: 1s)')
 parser.add_argument('--verbose', '-v', action='store_true', help='agregar si se desea verbosidad de la herramienta (default: no)')
+parser.add_argument('--csv', '-c', dest='csv_file', default=None, help='agregar si se desea guardar los resultados para los rtts entre hops en un CSV')
 args = parser.parse_args()
 
 tau_by_n = {
@@ -76,7 +78,7 @@ def get_route_stats(rs):
     avg_delta = average([delta for (_, delta) in delta_rtts])
     std_delta = std([delta for (_, delta) in delta_rtts], ddof=1)
 
-    standardized_delta_rtts = map((lambda (ttl, delta): (ttl, (delta - avg_delta)/std_delta)), delta_rtts)
+    standardized_delta_rtts = map((lambda (ttl, delta): (ttl, (delta - avg_delta)/std_delta, delta)), delta_rtts)
 
     return table, list(standardized_delta_rtts)
 
@@ -119,6 +121,13 @@ for ttl in ttl_range:
     if dest_reached: break
 
 _, z_scores = get_route_stats(responses)
+
+if args.csv_file:
+    with open(args.csv_file, 'w') as out_f:
+        writer = csv.writer(out_f)
+        for row in z_scores:
+            writer.writerow(row)
+
 print "z-scores:", z_scores
 sample_size = len(z_scores)
 print "tau:", tau_by_n[sample_size]
@@ -130,7 +139,7 @@ def outlier(z_score, sample_size):
         print "ATENCION: Muestra muy grande, utilizando maximo tau"
         return z_score > tau_by_n[float('inf')]
 
-outliers_mask = list(map((lambda (ttl, z_score): outlier(z_score, sample_size)), z_scores))
+outliers_mask = list(map((lambda (ttl, z_score, delta): outlier(z_score, sample_size)), z_scores))
 
 if not any(outliers_mask):
     print "No se detectaron enlaces intercontinentales"
