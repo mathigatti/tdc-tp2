@@ -130,7 +130,7 @@ _, stats = get_route_stats(responses)
 if args.csv_file:
     with open(args.csv_file, 'w') as out_f:
         writer = csv.writer(out_f, delimiter='\t')
-        writer.writerow(('ttl', 'z-score', 'delta', 'avg_rtt', 'std_rtt','ips'))
+        writer.writerow(('ttl', 'z_score', 'delta', 'avg_rtt', 'std_rtt','ips'))
         for row in stats:
             writer.writerow(row)
 
