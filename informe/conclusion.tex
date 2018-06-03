@@ -1,15 +1,11 @@
 \section{Discusión}
 
-Como resultado final pudimos identificar de distintas maneras nodos destacados, por ejemplo a partir del grafo subyacente que armamos pudimos identificar en todos los casos al gateway a partir del nodo de mayor grado. A continuación describimos brevemente cada caso analizado por separado.
+Recapitulando, de lo dicho hasta aquí nos llevamos las siguientes conlusiones:
 
-\subsubsection{São Paulo}
+\begin{itemize}
+	\item Vistos los casos de Brasil y Rusia, podemos decir que la calidad de la detección automática depende en altísima medida de la longitud total de la ruta. Se podría concluir que un método estadístico de estas características puede preferirse para casos en los que se sabe de antemano que deben existir enlaces intercontinentales y se desea precisar cuáles son. Esto se debe a que la probabilidad de tener falsos positivos es bastante alta en caso de que no los haya, como una consecuencia de la arbitrariedad de las topologías de redes, y la existencia de posibles congestiones.
+	\item También vimos, con el caso de Rusia, que este modelo es muy sensible a anomalías como los caminos asimétricos (que sospechamos que fue uno de los problemas), o las congestiones en la red (otra suposición).
+	\item Aún en el caso de Australia, donde no parecieron verse anomalías grandes, el modelo tuvo problemas para inferir uno de los saltos continentales.
+\end{itemize}
 
-En la red domiciliaria se pudo ver en el grafo resultante como destacaban dos nodos. Uno de ellos, el de mayor grado, era el gateway, el otro creemos que fue la computadora que tomó las mediciones ya que estaba accediendo a multiples sitios de internet lo cual provoco un gran intercambio de paquetes.
-
-\subsubsection{Sidney}
-
-Este es el grafo mas grande y en el cual se vuelve aún mas claro el patrón que veniamos viendo, el nodo 10.2.203.254 resalta completamente de los demás y concuerda perfectamente con nuestra hipótesis de que el gateway es el que mas paquetes intercambia en este protocolo, lo cual lo vuelve un nodo destacado.
-
-\subsubsection{Moscow}
-
-Quizas por una mala configuración de la red o por la poca clientela que había en este local en el horario en que se tomaron las mediciones (7:10 AM) es que este grafo resultó ser tan pobre, de todas maneras se pueden observar perfectamente los dos nodos que uno esperaría ver como minimo. El gateway y la computadora que tomo las mediciones.
+En definitiva, notamos que este modelo tiene muchas oportunidades de mejora, y no es lo suficientemente robusto como para poder ser usado seriamente como un detector de enlaces intercontinentales. De hecho, salvo que se cuente con cierta metadata sobre el estado de la red, parece imposible tener un buen predictor, considerando la gran variedad de situaciones que se dan actualmente en las redes y que pueden meter ruido, desde congestiones hasta anomalías debidas a las topologías o los protocolos heterogeneos.
