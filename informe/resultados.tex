@@ -6,10 +6,9 @@ Los resultados de cada ruta se presentan en dos partes: primero se realiza una d
 
 \subsubsection*{Recorrido en el Planisferio}
 
-COMPLETAR: En esta parte creo que deberiamos responder las preguntas 
-¿Que porcentaje de saltos no responden los Time exceeded? ¿Cual es el largo de la ruta en terminos de
-los saltos que si responden? (todo esto se puede sacar viendo los csv)
-¿La ruta tiene enlaces intercontinentales? ¿Cuantos?
+A continuación se puede ver el recorrido realizado por los paquetes enviados al destino, como era de esperarse no se realizan saltos intercontinentales sino que se forma un camino bastante directo de Buenos Aires a São Paulo.
+
+De los 13 saltos necesarios para llegar al destinto 4 no respondieron el TTL, resultando en un 30\% de saltos sin respuesta de time exceeded y un largo de ruta de 9 hops que si respondieron.
 
 \begin{figure}[H]
   \centering
@@ -36,7 +35,9 @@ Vale decir que en este caso particular, lo que parece estar sucediendo es que ha
 
 \subsubsection*{Recorrido en el Planisferio}
 
-A continuación se puede ver de forma bastante clara como el paquete tuvo que pasar por estados unidos para luego ir a Europa Occidental hasta llegar finalmente a Rusia.
+A continuación se puede ver el recorrido realizado por los paquetes enviados al destino, este en principio puede ser extraño ya que realiza 3 saltos intercontinentales, en vez de 1 o 2 como era de esperarse, mas adelante nos explayaremos un poco sobre las razones por las cuales pudo haber sucedido esto.
+
+De los 30 saltos necesarios para llegar al destinto 3 no respondieron el TTL, resultando en un 10\% de saltos sin respuesta de time exceeded y un largo de ruta de 27 hops que si respondieron.
 
 \begin{figure}[H]
   \centering
@@ -57,7 +58,7 @@ Para este caso, podemos observar en la figura \ref{plot-moscow}, que se detectan
 
 El primer pico, que se da en el salto 11, coincide con un salto a un router de Roma, Italia (\texttt{89.221.41.171}). La cuestión es que el nodo desde el cual se realiza el hop también está ubicado en Italia (\texttt{185.70.203.32}), y dicho salto no fue detectado como outlier, pues en efecto tiene un RTT mucho más bajo. Una posible hipótesis que manejamos al respecto de porque ocurrió esto (que no se detecte el salto continental, pero sí el siguiente hop) es que el primer router al que se llega sea uno de los principales gateways de Italia, lo que provoque que se encuentre congestionado y el paquete que se manda quede encolado un largo tiempo antes de forwardearse al siguiente hop. 
 
-El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de "camino asimétrico" (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio del estado de la red: por alguna razón el camino "óptimo" desde Italia a Rusia dejo de estar habilitado.
+El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de \textit{camino asimétrico} (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio del estado de la red: por alguna razón el camino \textit{óptimo} desde Italia a Rusia dejo de estar habilitado.
 
 En definitiva, hay que decir que en este caso tuvimos dos falsos positivos y tres falsos negativos (Argentina-Italia, Italia-USA, USA-Rusia). 
 
@@ -67,7 +68,10 @@ Algo para señanalar, es que este caso se corrió desde la misma LAN que la ruta
 
 \subsubsection*{Recorrido en el Planisferio}
 
-A continuación se puede ver de forma bastante clara como el paquete tuvo que pasar por estados unidos para luego ir a Europa Occidental hasta llegar finalmente a Rusia.
+
+A continuación se puede ver el recorrido realizado por los paquetes enviados a Sidney, se realizaron 2 saltos intercontinentales. Uno de Argentina a Estados Unidos y otro de Estados Unidos a Australia lo cual parece indicar que no hay una conexión directa de America del Sur a oceanía pero si desde America del Norte.
+
+De los 26 saltos necesarios para llegar al destinto 6 no respondieron el TTL, resultando en un 23\% de saltos sin respuesta de time exceeded y un largo de ruta de 20 hops que si respondieron.
 
 \begin{figure}[H]
   \centering
