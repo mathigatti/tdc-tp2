@@ -1,26 +1,19 @@
 \section{Métodos}
+
 \subsection*{Herramientas}
-Para la captura de tráfico se utilizó el módulo de manipulación de paquetes \emph{Scapy} para python, el cual provee una interfaz sencilla para nuestros requerimientos puntuales. \emph{Scapy} permite la captura y posterior guardado de paquetes en una red, para luego ser filtrados, inspeccionados o manipulados con facilidad. Además, para incrementar la cantidad de paquetes vistos por un host, se activó el modo promiscuo o modo monitor en sus respectivas interfaces de red.
+Para la implementación de traceroute utilizamos el código provisto por la catedra al cual le realizamos ciertas modificaciones para poder detectar anomalías y guardar los datos obtenidos de forma más cómoda.
 
-\subsection*{Modelo de las fuentes}
+\subsection*{Detección de Anomalías}
 
-\subsubsection*{Fuente S1}
-Dado el tráfico de capa 2 obtenido en cada captura, se modeló una fuente de memoria nula S1 = $ \{ s_{1}, s_{2}, s_{3},...,s_{n} \}$ donde cada $ s_{i} $ está formado por una tupla <broadcast|unicast, protocolo capa 3>.
+Como se describe en Cimbala\footnote{http://www.net.in.tum.de/fileadmin/TUM/NET/NET-2012-08-1/
+NET-2012-08-1\_02.pdf} aplicamos un cálculo el cual compara los datos normalizados con z-score con una valor $\tau$ derivado del t-student con un $\alpha$ de 0.05 lo cual modela un intervalo de confianza el cual descarta los 0.025 percentiles.
 
-\subsubsection*{Fuente S2}
-Igualmente que S1, se modeló la fuente de memoria nula S2 con el objetivo utilizando sólo las direcciones IP dentro de paquetes de protocolo ARP con el objetivo de poder distinguir los hosts de cada red. En este caso se consideraron diversas opciones para el modelado de la fuente, donde cada $ s_{i} $ representaba las direcciones IP de los hosts, aunque su contabilización se regía por si la dirección aparecía en los campos:
-\begin{itemize}
-	\item Fuente o Destino
-	\item who-has Fuente
-	\item who-has Destino
-	\item is-at Fuente
-	\item is-at Destino
-\end{itemize}
 
 \subsubsection*{Capturas}
-Se hicieron 3 capturas en redes diferentes de 10000 paquetes cada una:
+Se corrió traceroute sobre 3 universidades distintas con un ttl de 30 y 40 queries. Con el objetivo de lograr contrastar elegimos universidades muy lejanas y muy cercanas. A continuación describimos brevemente a cada una.
+
 \begin{itemize}
-	\item Red hogareña mediana, con aproximadamente 10 usuarios, se utilizó una interfaz ethernet.
-	\item Red pública grande, en este caso se capturó mediante una interfaz wifi el tráfico del laboratorio de informática de la universidad.
-	\item Red pública grande, también mediante la interfaz wifi, se capturó el tráfico en un Starbucks.
+	\item Universidad de Rosario (www.unr.edu.ar) esta será la universidad mas cercana ubicandose no solo en el mismo continente sino que en el mismo país, por lo cual esperamos que no haya ningún enlace intercontinental.
+	\item Universidad de Sidney (www.sydney.edu.au) escogimos esta universidad ya que nos surgió la duda de si existirá algún enlace intercontinental directo entre oceanía y america o tendrá que pasar europa resultando en varios enlaces.
+	\item Universidad de Moscow (www.msu.ru) al estar ubicada en un punto tan alejado de nosotros estabamos seguros de que iba a haber algún salto intercontinental y quizás más.
 \end{itemize}
