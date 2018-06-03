@@ -1,6 +1,7 @@
 import pandas as pd
 import argparse
 import matplotlib.pyplot as plt
+import os
 
 tau_by_n = {
     3: 1.1511,
@@ -35,7 +36,7 @@ tau_by_n = {
     float('inf'): 1.9600
 }
 
-def make_line_plot(df, tau, n):
+def make_line_plot(df, tau, n, name):
 	plt.subplot(2, 1, 1)
 	plt.plot(df.ttl.values, df.delta.values, '.-')
 	plt.ylabel('Delta RTT (ms)')
@@ -51,14 +52,16 @@ def make_line_plot(df, tau, n):
 	ax = plt.gca()
 	ax.hlines(tau, 1, df.ttl.max(), linestyle='--', linewidth=1, label=u'tau para n={}'.format(n), color='green')
 	ax.legend()
-	plt.show()	
+	plt.savefig('{}.pdf'.format(name))	
 
 
 parser = argparse.ArgumentParser(description='Implementacion en scapy de traceroute')
 parser.add_argument('--filename', '-f', dest='filename')
 args = parser.parse_args()
 
+name = os.path.basename(args.filename).split('.')[0]
+
 df = pd.read_csv(args.filename, sep='\t')
 n = df.shape[0]
 tau = tau_by_n[n]
-make_line_plot(df, tau, n)
+make_line_plot(df, tau, n, name)
