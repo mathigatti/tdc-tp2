@@ -1,6 +1,38 @@
 \section{Resultados y análisis}
 
+Los resultados de cada ruta se presentan en dos partes: primero se realiza una descripción geográfica de la ruta trazada, basada en las ips seguidas, prestando particular atención a los saltos intercontinentales; en la segunda parte se analizan los RTTs entre saltos, de los cuales se busca poder inferir en forma automática los enlaces intercontinentales detectados en la primer parte.
+
 \subsection*{Universidad de São Paulo}
+
+\subsubsection*{Recorrido en el Planisferio}
+
+COMPLETAR: En esta parte creo que deberiamos responder las preguntas 
+¿Que porcentaje de saltos no responden los Time exceeded? ¿Cual es el largo de la ruta en terminos de
+los saltos que si responden? (todo esto se puede sacar viendo los csv)
+¿La ruta tiene enlaces intercontinentales? ¿Cuantos?
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=8.5cm]{figs/saopaulo.png}
+  \caption{\footnotesize Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio \texttt{www5.usp.br}}
+\end{figure}
+
+\subsubsection*{RTT entre saltos}
+
+Analicemos cómo funciona nuestro modelo para inferir saltos intercontinentales, en un caso donde sabemos que no hay ninguno.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=8.5cm]{figs/traceroute-saopaulo.pdf}
+  \caption{\footnotesize RTT entre saltos (antes y después de normalizar respectivamente) para el sitio \texttt{www5.usp.br}. $n$ es la cantidad de TTLs para los que se obtuvo un \emph{time exceed} (que son los puntos que se grafican).}
+  \label{plot-saopaulo}
+\end{figure}
+
+Viendo la figura \ref{plot-saopaulo}, observamos que hay un falso positivo: el RTT estandarizado del primer hop supera el umbral dado por la $\tau$ del Test de Thompson. Podemos entender esto como una consecuencia de que el test utilizado no hace más que buscar valores atípicos (en nuestro caso atípicamente grandes) dentro de una muestra. Por lo tanto, en la medida que los RTTs entre hops no sean equitativos, no es de sorprender que casi siempre encontremos algún salto que sobresalga del resto. La clave está en que si tuviéramos un trayecto significativamente más largo, este valor que ahora resulta un outlier muy posiblemente quedaría opacado por el RTT diferencial de un verdadero salto continental.
+
+Vale decir que en este caso particular, lo que parece estar sucediendo es que hay una cuestión técnica de la LAN desde la cual se dispara el \emph{traceroute} que dificulta alcanzar el \emph{gateway}, pues 80ms parece un tiempo elevado para esto. Independientemente, se probó llegar al mismo destino desde otra LAN con mejor tiempo de llegada al \emph{gateway}, y sin embargo también se obtuvo un outlier en un hop posterior, reafirmando el punto anterior de que lo que se considera un outlier depende fuertemente de la escala de la ruta. 
+
+\subsection*{Universidad de Moscú}
 
 \subsubsection*{Recorrido en el Planisferio}
 
@@ -8,24 +40,24 @@ A continuación se puede ver de forma bastante clara como el paquete tuvo que pa
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=8.5cm]{figs/saopaulo.png}
-  \caption{\normalfont Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio XXXXXXXXXXXXXXXXXXXXXXXXXX}
+  \includegraphics[width=8.5cm]{figs/moscow.png}
+  \caption{\footnotesize Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio \texttt{www.msu.com}}
 \end{figure}
 
 \subsubsection*{RTT entre saltos}
 
-A continuación intentamos ver los timepos entre saltos. Para esto calculamos la media de cada de los RTTs obtenidos de cada TTL para reducir a solo un valor las mediciones obtenidas por cada TTL. 
-
-Seguido de esto realizamos dos experimentos. Primero simplemente restamos los RTTs medios entre si como se puede ver en el primer gráfico, luego llevamos el experimento un paso mas allá normalizando con z-score los RTTs para eliminar cualquier tipo de deformación en las dimensiones del gráfico.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=8.5cm]{figs/traceroute-saopaulo.pdf}
-  \caption{\normalfont RTT entre saltos (antes y después de normalizar respectivamente) para el sitio XXXXXXXXXXXXXXXXXXXXXX}
+  \includegraphics[width=8.5cm]{figs/traceroute-moscow.pdf}
+  \caption{\footnotesize RTT entre saltos (antes y después de normalizar respectivamente) para el sitio \texttt{www.msu.com}. $n$ es la cantidad de TTLs para los que se obtuvo un \emph{time exceed} (que son los puntos que se grafican).}
+  \label{plot-moscow}
 \end{figure}
 
-Como se puede observar ... COMPLETAR.
+Para este caso, podemos observar en la figura \ref{plot-moscow}, que se detectan dos saltos intercontinentales. Este caso tiene bastantes particularidades, en parte a la ruta compleja que se vió en el punto anterior. 
 
+El primer pico, que se da en el salto 11, coincide con un salto a un router de Roma, Italia (\texttt{89.221.41.171}). La cuestión es que el nodo desde el cual se realiza el hop también está ubicado en Italia (\texttt{185.70.203.32}), y dicho salto no fue detectado como outlier, pues en efecto tiene un RTT mucho más bajo. Una posible hipótesis que manejamos al respecto de porque ocurrió esto (que no se detecte el salto continental, pero sí el siguiente hop) es que el primer router al que se llega sea uno de los principales gateways de Italia, lo que provoque que se encuentre congestionado y el paquete que se manda quede encolado un largo tiempo antes de forwardearse al siguiente hop. 
+
+El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de "camino asimétrico" (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio de estado de la red: por alguna razón el camino "óptimo" desde Italia a Rusia dejo de estar habilitado.
 
 \subsection*{Universidad de Sidney}
 
@@ -36,7 +68,7 @@ A continuación se puede ver de forma bastante clara como el paquete tuvo que pa
 \begin{figure}[H]
   \centering
   \includegraphics[width=8.5cm]{figs/sidney.png}
-  \caption{\normalfont Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio sydney.edu.au}
+  \caption{\footnotesize Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio \texttt{sydney.edu.au}}
 \end{figure}
 
 \subsubsection*{RTT entre saltos}
@@ -48,34 +80,7 @@ Seguido de esto realizamos dos experimentos. Primero simplemente restamos los RT
 \begin{figure}[H]
   \centering
   \includegraphics[width=8.5cm]{figs/traceroute-sidney.pdf}
-  \caption{\normalfont RTT entre saltos (antes y después de normalizar respectivamente) para el sitio sydney.edu.au}
-\end{figure}
-
-Como se puede observar ... COMPLETAR.
-
-
-\subsection*{Universidad de Moscú}
-
-\subsubsection*{Recorrido en el Planisferio}
-
-A continuación se puede ver de forma bastante clara como el paquete tuvo que pasar por estados unidos para luego ir a Europa Occidental hasta llegar finalmente a Rusia.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=8.5cm]{figs/moscow.png}
-  \caption{\normalfont Recorrido realizado por los paquetes durante la ejecución de traceroute al intentar alcanzar el sitio www.msu.com}
-\end{figure}
-
-\subsubsection*{RTT entre saltos}
-
-A continuación intentamos ver los timepos entre saltos. Para esto calculamos la media de cada de los RTTs obtenidos de cada TTL para reducir a solo un valor las mediciones obtenidas por cada TTL. 
-
-Seguido de esto realizamos dos experimentos. Primero simplemente restamos los RTTs medios entre si como se puede ver en el primer gráfico, luego llevamos el experimento un paso mas allá normalizando con z-score los RTTs para eliminar cualquier tipo de deformación en las dimensiones del gráfico.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=8.5cm]{figs/traceroute-moscow.pdf}
-  \caption{\normalfont RTT entre saltos (antes y después de normalizar respectivamente) para el sitio www.msu.com}
+  \caption{\footnotesize RTT entre saltos (antes y después de normalizar respectivamente) para el sitio \texttt{sydney.edu.au}. $n$ es la cantidad de TTLs para los que se obtuvo un \emph{time exceed} (que son los puntos que se grafican).}
 \end{figure}
 
 Como se puede observar ... COMPLETAR.
