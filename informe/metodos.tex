@@ -5,8 +5,7 @@ Para la implementación de traceroute utilizamos el código provisto por la cát
 
 \subsection*{Detección de saltos intercontinentales}
 
-Para la detección automática de saltos intercontinentales aplicamos una técnica basada en el Modified Thompson Tau Test para detección de outliers, como se explica en [Cimbala]\footnote{http://www.net.in.tum.de/fileadmin/TUM/NET/NET-2012-08-1/
-NET-2012-08-1\_02.pdf}. Dicho test consiste en comparar el valor absoluto de las muestras estandarizadas (mediante z-score) contra un estadístico, $\tau$, que depende del tamaño de la muestra. En particular, nuestra versión difiere con la presentada en [Cimbala] en que no tomamos el valor absoluto del z-score, dado que no estamos interesados en detectar los casos atípicamente pequeños. 
+Para la detección automática de saltos intercontinentales aplicamos una técnica basada en el Modified Thompson Tau Test para detección de outliers, como se explica en [Cimbala]\footnote{http://www.mne.psu.edu/cimbala/me345/Lectures/Outliers.pdf}. Dicho test consiste en comparar el valor absoluto de las muestras estandarizadas (mediante z-score) contra un estadístico, $\tau$, que depende del tamaño de la muestra. En particular, nuestra versión difiere con la presentada en [Cimbala] en que no tomamos el valor absoluto del z-score, dado que no estamos interesados en detectar los casos atípicamente pequeños. 
 
 \subsection*{Asunciones realizadas}
 \begin{itemize}
