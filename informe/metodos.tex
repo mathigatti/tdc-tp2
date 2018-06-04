@@ -11,7 +11,7 @@ NET-2012-08-1\_02.pdf}. Dicho test consiste en comparar el valor absoluto de las
 \subsection*{Asunciones realizadas}
 \begin{itemize}
 	\item A los fines prácticos, vamos a considerar que un salto de América del Sur a América del Norte se considera un salto intercontinental, por la extensión del mismo.
-	\item A veces se da el caso en que el RTT promedio para un cierto TTL puede ser menor que el RTT del TTL anterior. Ante esta situación seteamos el RTT diferencial (delta) en 0. Razones por las que puede suceder esto son el problema de los \emph{caminos asimétricos}, o bien que haya un desvío estándar elevado y el hop realizado sea corto. O sea que este 0 no debe ser considerado como que realmente el tiempo de RTT es despreciable, si no más bien como un resultado desafortunado. Se nos presento entonces la duda de si considerar estos valores o no a la hora de hacer el cálculo de los \emph{outliers}. Decidimos que tanto un problema como el otro pueden estar afectando a otros hops que sin embargo no llegaron a dar 0, pero dieron un valor menor al que deberían. Por lo tanto, sería injusto (y posiblemente un error metodológico) solo omitir a los valores nulos.
+	\item A veces se da el caso en que el RTT promedio para un cierto TTL puede ser menor que el RTT del TTL anterior. Ante esta situación seteamos el RTT diferencial (delta) en 0. Razones por las que puede suceder esto son el problema de los \emph{caminos asimétricos}, o bien que haya un desvío estándar elevado y el hop realizado sea corto. O sea que este 0 no debe ser considerado como que realmente el tiempo de RTT es despreciable, si no más bien como un resultado desafortunado. Se nos presentó entonces la duda de si considerar estos valores o no a la hora de hacer el cálculo de los \emph{outliers}. Decidimos que tanto un problema como el otro pueden estar afectando a otros hops que sin embargo no llegaron a dar 0, pero dieron un valor menor al que deberían. Por lo tanto, sería injusto (y posiblemente un error metodológico) sólo omitir a los valores nulos.
 \end{itemize}
 
 
@@ -20,6 +20,6 @@ Se corrió traceroute sobre 3 universidades distintas con un ttl de 30 y 40 quer
 
 \begin{itemize}
 	\item Universidad de São Paulo (\texttt{www5.usp.br}) esta será la universidad mas cercana, ubicada en el mismo continente, por lo cual esperamos que no haya ningún enlace intercontinental.
-	\item Universidad de Sidney (\texttt{www.sydney.edu.au}) escogimos esta universidad ya que nos surgió la duda de si existirá algún enlace intercontinental directo entre oceanía y america o tendrá que pasar europa resultando en varios enlaces.
-	\item Universidad de Moscú (\texttt{www.msu.ru}) al estar ubicada en un punto tan alejado de nosotros estabamos seguros de que iba a haber algún salto intercontinental y quizás más.
+	\item Universidad de Sidney (\texttt{www.sydney.edu.au}) escogimos esta universidad ya que nos surgió la duda de si existirá algún enlace intercontinental directo entre Oceanía y América o tendrá que pasar europa resultando en varios enlaces.
+	\item Universidad de Moscú (\texttt{www.msu.ru}) al estar ubicada en un punto tan alejado de nosotros estábamos seguros de que iba a haber algún salto intercontinental y quizás más.
 \end{itemize}
