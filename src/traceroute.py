@@ -146,15 +146,3 @@ def outlier(z_score, sample_size):
         return z_score > tau_by_n[float('inf')]
 
 outliers_mask = list(map((lambda (ttl, z_score, delta, avg_rtt, std_rtt, ips): outlier(z_score, sample_size)), stats))
-
-if not any(outliers_mask):
-    print "No se detectaron enlaces intercontinentales"
-else:
-    for i in xrange(len(outliers_mask)):
-        if outliers_mask[i]:
-            print "Hay un enlace intercontinental en el salto", stats[i][0], "con z-score", stats[i][1]
-
-
-            
-
-
