@@ -27,9 +27,15 @@ Analicemos cómo funciona nuestro modelo para inferir saltos intercontinentales,
   \label{plot-saopaulo}
 \end{figure}
 
-Viendo la figura \ref{plot-saopaulo}, observamos que hay un falso positivo: el RTT estandarizado del primer hop supera el umbral dado por la $\tau$ del Test de Thompson. Podemos entender esto como una consecuencia de que el test utilizado no hace más que buscar valores atípicos (en nuestro caso atípicamente grandes) dentro de una muestra. Por lo tanto, en la medida que los RTTs entre hops no sean equitativos, no es de sorprender que casi siempre encontremos algún salto que sobresalga del resto. La clave está en que si tuviéramos un trayecto significativamente más largo, este valor que ahora resulta un outlier muy posiblemente quedaría opacado por el RTT diferencial de un verdadero salto continental.
+Los outliers detectados por el método de Cimbala son los siguientes (en este orden):
+\begin{itemize}
+  \item Salto 1 con z-score 2.08151529601 ($n=7$)
+  \item Salto 8 con z-score 2.00270114286 ($n=6$)
+\end{itemize}
 
-Vale decir que en este caso particular, lo que parece estar sucediendo es que hay una cuestión técnica de la LAN desde la cual se dispara el \emph{traceroute} que dificulta alcanzar el \emph{gateway}, pues 80ms parece un tiempo elevado para esto. Independientemente, se probó llegar al mismo destino desde otra LAN con mejor tiempo de llegada al \emph{gateway}, y sin embargo también se obtuvo un outlier en un hop posterior, reafirmando el punto anterior de que lo que se considera un outlier depende fuertemente de la escala de la ruta. 
+Obviamente, ambos son falsos positivos. Podemos entender esto como una consecuencia de que el test utilizado no hace más que buscar valores atípicos (en nuestro caso atípicamente grandes) dentro de una muestra. Por lo tanto, en la medida que los RTTs entre hops no sean equitativos, no es de sorprender que casi siempre encontremos algún salto que sobresalga del resto. La clave está en que si tuviéramos un trayecto significativamente más largo, este valor que ahora resulta un outlier muy posiblemente quedaría opacado por el RTT diferencial de un verdadero salto continental. Esto es más claro para el segundo outlier, que coincide con el salto de Argentina a Brasil (un salto relativamente grande para esta muestra, ver figura \ref{plot-saopaulo}).
+
+Vale decir que en el primer caso lo que parece estar sucediendo es que hay una cuestión técnica de la LAN desde la cual se dispara el \emph{traceroute} que dificulta alcanzar el \emph{gateway}, pues 80ms parece un tiempo elevado para esto (viendo la figura \ref{plot-saopaulo} el RTT de este hop supera por mucho al que va hasta Río de Janeiro).
 
 \subsection*{Universidad de Moscú}
 
@@ -54,15 +60,22 @@ De los 30 saltos necesarios para llegar al destino 3 no respondieron el TTL, res
   \label{plot-moscow}
 \end{figure}
 
-Para este caso, podemos observar en la figura \ref{plot-moscow}, que se detectan dos saltos intercontinentales. Este caso tiene bastantes particularidades, relacionadas con la ruta compleja que se vió en el punto anterior. 
+Para este sitio, el algoritmo detecta los siguientes enlaces continentales:
+\begin{itemize}
+  \item Salto 11 con z-score 1.78130453282 ($n=9$)
+  \item Salto 15 con z-score 2.07044455379 ($n=8$)
+  \item Salto 1 con z-score 2.00892644697 ($n=7$)
+\end{itemize}
 
-El primer pico, que se da en el salto 11, coincide con un salto a un router de Roma, Italia (\texttt{89.221.41.171}). La cuestión es que el nodo desde el cual se realiza el hop también está ubicado en Italia (\texttt{185.70.203.32}), y dicho salto no fue detectado como outlier, pues en efecto tiene un RTT mucho más bajo. Una posible hipótesis que manejamos al respecto de porqué ocurrió esto (que no se detecte el salto continental, pero sí el siguiente hop) es que el primer router al que se llega sea uno de los principales gateways de Italia, lo que provoque que se encuentre congestionado y el paquete que se manda quede encolado un largo tiempo antes de forwardearse al siguiente hop. 
+Este caso tiene bastantes particularidades, relacionadas con la ruta compleja que se observó en el punto anterior. 
 
-El segundo pico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de \textit{camino asimétrico} (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio del estado de la red: posiblemente el paquete se mandó a Italia porque había una ruta aprendida que iba directamente de Italia a Rusia sin salir del continente, pero por alguna razón dicho camino \emph{óptimo} dejó de estar habilitado.
+El primer outlier, que se da en el salto 11, coincide con un salto a un router de Roma, Italia (\texttt{89.221.41.171}). La cuestión es que el nodo desde el cual se realiza el hop también está ubicado en Italia (\texttt{185.70.203.32}), y dicho salto no fue detectado como outlier, pues en efecto tiene un RTT mucho más bajo. Una posible hipótesis que manejamos al respecto de porqué ocurrió esto (que no se detecte el salto continental, pero sí el siguiente hop) es que el primer router al que se llega sea uno de los principales gateways de Italia, lo que provoque que se encuentre congestionado y el paquete que se manda quede encolado un largo tiempo antes de forwardearse al siguiente hop. 
 
-En definitiva, hay que decir que en este caso tuvimos dos falsos positivos y tres falsos negativos (Argentina-Italia, Italia-USA, USA-Rusia). 
+El segundo punto atípico, con TTL 15, presenta una situación similar: el destino está en Estados Unidos, pero los tres saltos anteriores también, y no fueron detectados. Acá hay una diferencia sin embargo: esos tres saltos mostraron todos RTTs diferenciales de 0, lo que implica que de hecho el RTT promedio de estos nodos fue menor que el promedio del último router que estaba en Italia. Este parece ser un caso de \textit{camino asimétrico} (Jobst 2012). Razonablemente existe una mejor ruta desde Estados Unidos a Argentina, que cruzar toda Europa. Que la ruta no haya ido directamente por Estados Unidos, salteandose Italia, suena a una consecuencia de un cambio del estado de la red: posiblemente el paquete se mandó a Italia porque había una ruta aprendida que iba directamente de Italia a Rusia sin salir del continente, pero por alguna razón dicho camino \emph{óptimo} dejó de estar habilitado.
 
-Algo para señalar, es que este caso se corrió desde la misma LAN que la ruta anterior, y puede verse en los gráficos que efectivamente el RTT del primer salto fue igual, pero en este caso, a diferencia del anterior, no se consideró un \emph{outlier}, pues había saltos mucho más costosos. Esto viene a fortalecer la hipótesis de que la longitud de la ruta afecta la calidad de la inferencia.
+Nuevamente se detectó el primer salto, dado que este experimento fue corrido desde la misma LAN.
+
+En definitiva, hay que decir que en este caso tuvimos tres falsos positivos y tres falsos negativos (Argentina-Italia, Italia-USA, USA-Rusia).
 
 \subsection*{Universidad de Sidney}
 
@@ -87,8 +100,19 @@ De los 26 saltos necesarios para llegar al destino 6 no respondieron el TTL, res
   \caption{\footnotesize RTT entre saltos (antes y después de normalizar respectivamente) para el sitio \texttt{sydney.edu.au}. $n$ es la cantidad de TTLs para los que se obtuvo un \emph{time exceeded} (que son los puntos que se grafican).}
 \end{figure}
 
-Finalmente, para esta ruta vemos que se detectó un salto intercontinental en el octavo hop. Este efectivamente fue un salto de Argentina a Estados Unidos (que como mencionamos en la sección anterior, vamos a considerar un salto continental). Por otro lado, no se detectó el salto de Estados Unidos a Australia en el salto 19, aunque puede verse en el gráfico que estuvo bastante cerca de alcanzar el threshold.
+Los resultados arrojados por el algoritmo fueron:
 
-Para esta ruta tuvimos entonces un falso negativo, y un verdadero positivo.
+\begin{itemize}
+  \item Salto 8 con z-score 2.62854380167 ($n=11$)
+  \item Salto 19 con z-score 2.540003618 ($n=10$)
+  \item Salto 12 con z-score 1.83643437065 ($n=9$)
+  \item Salto 22 con z-score 1.97868824766 ($n=8$)
+\end{itemize}
+
+Para esta ruta vemos que se detectó un salto intercontinental en el octavo hop. Este efectivamente fue un salto de Argentina a Estados Unidos (que como mencionamos en la sección anterior, vamos a considerar un salto continental). Asimismo, se detectó el salto de Estados Unidos a Australia (TTL 19).
+
+Sin embargo tuvimos dos falsos positivos también: tanto el salto 12 como el 22 fueron detectados aunque no son saltos continentales. De todas formas hay que destacar que el hop 22 coincide con el salto que cruza toda Australia (ver mapa), por lo que puede considerarse un error no tan terrible, dada la extensión del país.
+
+En esta ruta tuvimos entonces dos \emph{true positives} y dos \emph{false negatives}.
 
 Algo que puede valer la pena mencionar de este caso es que la mayoría de los valles donde el delta RTT da 0ms son saltos donde la diferencia de tiempo es menor que la varianza, lo cual es razonable ya que se mueven entre nodos que están cercanos entre sí.
